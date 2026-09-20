@@ -29,6 +29,8 @@ function InterviewAppContent() {
     handleSubmitQuestion,
     handleClearSession,
     questionCount,
+    backendUrl,
+    handleSaveBackendUrl,
   } = useInterview()
 
   return (
@@ -51,6 +53,8 @@ function InterviewAppContent() {
           isPaused={isPaused}
           onClearSession={handleClearSession}
           onSubmitQuestion={handleSubmitQuestion}
+          backendUrl={backendUrl}
+          onSaveBackendUrl={handleSaveBackendUrl}
         />
 
         {/* Parakeet AI Q&A Teleprompter Canvas */}

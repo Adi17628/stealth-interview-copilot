@@ -144,6 +144,11 @@ async def process_and_send_answer(websocket: WebSocket, text: str, ctx, provider
         print(f"[ws] Error processing answer: {e}")
         try:
             await websocket.send_json({
+                "type": "answer_chunk",
+                "answer_id": answer_id,
+                "text": f"⚠️ Generation issue: {str(e)}",
+            })
+            await websocket.send_json({
                 "type": "answer_done",
                 "answer_id": answer_id,
                 "latency_ms": round((time.perf_counter() - t_start) * 1000),
@@ -290,7 +295,7 @@ async def websocket_endpoint(websocket: WebSocket):
     client_id = websocket.query_params.get("client_id")
     if client_id and client_id in _client_websockets:
         old_ws = _client_websockets[client_id]
-        if old_ws in _active_websockets:
+        if old_ws and old_ws != websocket and old_ws in _active_websockets:
             print(f"[ws] Closing stale socket for client_id: {client_id}")
             _active_websockets.discard(old_ws)
             _websocket_providers.pop(old_ws, None)
@@ -332,6 +337,11 @@ async def websocket_endpoint(websocket: WebSocket):
                 continue
 
             msg_type = msg.get("type")
+
+            # ── Handle Keep-Alive Heartbeat ────────────
+            if msg_type == "ping":
+                await websocket.send_json({"type": "pong"})
+                continue
 
             # ── Handle Provider Switch ─────────────────
             if msg_type == "set_provider":

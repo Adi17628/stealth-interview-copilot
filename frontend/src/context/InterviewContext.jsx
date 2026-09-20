@@ -187,9 +187,25 @@ export function InterviewProvider({ children }) {
     }
   }, [])
 
-  const { sendMessage, isConnected } = useWebSocket({
+  const { sendMessage, isConnected, reconnect } = useWebSocket({
     onMessage: handleWsMessage,
   })
+
+  const [backendUrl, setBackendUrl] = useState(() => {
+    return localStorage.getItem('intervai_backend_url') || ''
+  })
+
+  const handleSaveBackendUrl = useCallback((url) => {
+    const clean = (url || '').trim()
+    if (clean) {
+      localStorage.setItem('intervai_backend_url', clean)
+      setBackendUrl(clean)
+    } else {
+      localStorage.removeItem('intervai_backend_url')
+      setBackendUrl('')
+    }
+    setTimeout(() => reconnect(), 100)
+  }, [reconnect])
 
   // ── Sync provider to backend on connect or switch ─
   useEffect(() => {
@@ -447,6 +463,9 @@ export function InterviewProvider({ children }) {
     handleSubmitQuestion,
     handleClearSession,
     questionCount,
+    backendUrl,
+    handleSaveBackendUrl,
+    reconnect,
   }
 
   return (
