@@ -1,0 +1,78 @@
+.mic-button {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  border-radius: var(--radius-full);
+  border: none;
+  background: linear-gradient(180deg, #f43f5e, #e11d48);
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    0 8px 24px rgba(244, 63, 94, 0.2),
+    inset 0 -4px 8px rgba(0, 0, 0, 0.15);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  z-index: 1;
+  flex-shrink: 0;
+}
+
+.mic-button:hover:not(.mic-active) {
+  transform: scale(1.06);
+  box-shadow:
+    0 10px 32px rgba(244, 63, 94, 0.3),
+    inset 0 -4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.mic-button:active {
+  transform: scale(0.96);
+}
+
+.mic-button.mic-active {
+  background: linear-gradient(180deg, #ef4444, #dc2626);
+}
+
+.mic-icon {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Ripple animation */
+.mic-ripple {
+  position: absolute;
+  inset: -4px;
+  border-radius: var(--radius-full);
+  border: 2px solid rgba(244, 63, 94, 0.4);
+  animation: mic-ripple-expand 1.8s infinite ease-out;
+  pointer-events: none;
+}
+
+.mic-ripple-delay {
+  animation-delay: 0.6s;
+}
+
+@keyframes mic-ripple-expand {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .mic-button {
+    width: 64px;
+    height: 64px;
+  }
+  .mic-icon svg {
+    width: 22px;
+    height: 22px;
+  }
+}

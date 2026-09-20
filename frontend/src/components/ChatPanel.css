@@ -1,0 +1,188 @@
+/* ═══════════════════════════════════════════════════════
+   ChatPanel.css — Parakeet AI Canvas & Empty State
+   ═══════════════════════════════════════════════════════ */
+
+.parakeet-chat-canvas {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 4px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* ── Live Concurrent Interim Hearing Strip ─────────── */
+.parakeet-interim-pill {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(30, 41, 59, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  padding: 8px 16px;
+  border-radius: var(--radius-pill);
+  margin-bottom: 14px;
+  animation: interim-fade 200ms ease-out forwards;
+}
+
+@keyframes interim-fade {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.interim-indicator {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  height: 14px;
+}
+
+.interim-wave-bar {
+  width: 3px;
+  background: var(--accent-cyan);
+  border-radius: 2px;
+  animation: wave-bar 900ms infinite ease-in-out;
+}
+
+.interim-wave-bar.bar1 { height: 6px; animation-delay: 0ms; }
+.interim-wave-bar.bar2 { height: 14px; animation-delay: 200ms; }
+.interim-wave-bar.bar3 { height: 9px; animation-delay: 400ms; }
+
+@keyframes wave-bar {
+  0%, 100% { transform: scaleY(0.4); }
+  50% { transform: scaleY(1.2); }
+}
+
+.interim-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #38bdf8;
+  white-space: nowrap;
+}
+
+.interim-content {
+  font-size: 0.88rem;
+  color: #f1f5f9;
+  font-style: italic;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Empty State ───────────────────────────────────── */
+.parakeet-empty-state {
+  margin: auto;
+  width: 100%;
+  max-width: 680px;
+  background: var(--bg-card);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-xl);
+  padding: 32px 28px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: var(--shadow-hud);
+}
+
+.empty-state-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(56, 189, 248, 0.1);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  color: #38bdf8;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  margin-bottom: 16px;
+}
+
+.empty-sparkle {
+  color: var(--accent-cyan);
+}
+
+.empty-state-title {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 8px;
+  letter-spacing: -0.01em;
+}
+
+.empty-state-desc {
+  font-size: 0.9rem;
+  color: #94a3b8;
+  line-height: 1.6;
+  max-width: 500px;
+  margin-bottom: 24px;
+}
+
+.empty-practice-section {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.practice-header {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.practice-prompts-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.practice-prompt-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #e2e8f0;
+  font-size: 0.82rem;
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.practice-prompt-pill:hover {
+  background: rgba(56, 189, 248, 0.12);
+  border-color: rgba(56, 189, 248, 0.35);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.pill-bolt {
+  color: var(--accent-star);
+  font-size: 0.8rem;
+}
+
+/* ── Feed & Scroll Anchor ──────────────────────────── */
+.parakeet-cards-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-bottom: 12px;
+}
+
+.scroll-anchor {
+  height: 1px;
+}

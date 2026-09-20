@@ -1,0 +1,168 @@
+/* ═══════════════════════════════════════════════════════
+   AudioDock.css — Parakeet AI Floating Stealth Cockpit
+   ═══════════════════════════════════════════════════════ */
+
+.parakeet-floating-dock {
+  position: fixed;
+  bottom: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 36px);
+  max-width: 900px;
+  z-index: 100;
+  pointer-events: none;
+}
+
+.parakeet-dock-capsule {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: var(--bg-dock);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-pill);
+  padding: 6px 14px 6px 10px;
+  box-shadow: var(--shadow-dock);
+  transition: all var(--transition-base);
+}
+
+.parakeet-dock-capsule:hover {
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+/* ── Left: Audio Mode Selector Pills ──────────────── */
+.dock-mode-selector {
+  display: flex;
+  align-items: center;
+  background: rgba(20, 26, 38, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-pill);
+  padding: 3px;
+  gap: 2px;
+}
+
+.dock-mode-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 5px 11px;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.dock-mode-btn:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.dock-mode-btn.active {
+  background: #1e293b;
+  color: #ffffff;
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+}
+
+.dock-mode-btn.active .mode-icon {
+  filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.6));
+}
+
+.mode-icon {
+  font-size: 0.82rem;
+}
+
+/* ── Middle: Audio Waveform Canvas ─────────────────── */
+.dock-wave-container {
+  flex: 1;
+  max-width: 140px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 20, 30, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-pill);
+  padding: 0 8px;
+}
+
+.dock-wave-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ── Right: Auto Answer & Model Controls ───────────── */
+.dock-controls-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dock-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-badge);
+  color: #e2e8f0;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 5px 11px;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.dock-pill-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.auto-answer-btn.active {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.35);
+  color: #34d399;
+}
+
+.auto-answer-btn.paused {
+  background: rgba(244, 63, 94, 0.12);
+  border-color: rgba(244, 63, 94, 0.35);
+  color: #fb7185;
+}
+
+.model-btn.openai {
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.model-btn.gemini {
+  border-color: rgba(56, 189, 248, 0.3);
+}
+
+.dock-icon-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-badge);
+  color: #cbd5e1;
+  font-size: 0.85rem;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.dock-icon-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
+}

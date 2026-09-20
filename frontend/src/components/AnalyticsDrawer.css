@@ -1,0 +1,269 @@
+/* ═══════════════════════════════════════════════════════
+   AnalyticsDrawer — Session Telemetry Slide-Over Styles
+   ═══════════════════════════════════════════════════════ */
+
+.analytics-drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(8px);
+  z-index: 100;
+  display: flex;
+  justify-content: flex-end;
+  animation: fadeIn 200ms ease;
+}
+
+.analytics-drawer {
+  width: 100%;
+  max-width: 440px;
+  height: 100%;
+  background: rgba(12, 17, 30, 0.96);
+  border-left: 1px solid var(--glass-border-hover);
+  box-shadow: -12px 0 40px rgba(0, 0, 0, 0.8);
+  display: flex;
+  flex-direction: column;
+  animation: slideInRight 250ms cubic-bezier(0.16, 1, 0.3, 1);
+  overflow-y: auto;
+}
+
+.drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.drawer-title-area {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.drawer-icon {
+  font-size: 1.5rem;
+}
+
+.drawer-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.drawer-subtitle {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.drawer-close-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--glass-border);
+  color: var(--text-muted);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.drawer-close-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.drawer-body {
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  flex: 1;
+}
+
+/* ── KPI Grid ───────────────────────────────────────── */
+.telemetry-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.telemetry-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+}
+
+.telemetry-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.telemetry-val {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 4px 0 2px 0;
+  font-family: var(--font-family-mono);
+}
+
+.telemetry-hint {
+  font-size: 0.72rem;
+  color: var(--text-dim);
+}
+
+/* ── Section Styles ─────────────────────────────────── */
+.drawer-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.section-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* ── Pipeline Bar ───────────────────────────────────── */
+.pipeline-bar-wrapper {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.pipeline-bar {
+  height: 10px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 5px;
+  overflow: hidden;
+  display: flex;
+  margin-bottom: 10px;
+}
+
+.bar-segment.db {
+  background: linear-gradient(90deg, #10b981, #06b6d4);
+  transition: width 0.4s ease;
+}
+
+.bar-segment.gemini {
+  background: linear-gradient(90deg, #6366f1, #a855f7);
+  transition: width 0.4s ease;
+}
+
+.pipeline-legend {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.legend-dot.db {
+  background: #10b981;
+}
+
+.legend-dot.gemini {
+  background: #6366f1;
+}
+
+/* ── Speaking Tips ──────────────────────────────────── */
+.tips-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tip-card {
+  display: flex;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+
+.tip-num {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(99, 102, 241, 0.2);
+  color: #818cf8;
+  font-weight: 700;
+  font-size: 0.75rem;
+  flex-shrink: 0;
+}
+
+.tip-card strong {
+  display: block;
+  color: #f1f5f9;
+  margin-bottom: 2px;
+}
+
+.tip-card p {
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* ── Actions ────────────────────────────────────────── */
+.drawer-actions {
+  margin-top: auto;
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--glass-border);
+}
+
+.clear-session-btn {
+  width: 100%;
+  background: rgba(244, 63, 94, 0.1);
+  border: 1px solid rgba(244, 63, 94, 0.3);
+  color: #fda4af;
+  padding: 10px;
+  border-radius: var(--radius-md);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.clear-session-btn:hover {
+  background: rgba(244, 63, 94, 0.2);
+  border-color: #f43f5e;
+  color: #fff;
+}
+
+/* ── Animations ─────────────────────────────────────── */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
