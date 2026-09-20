@@ -37,7 +37,18 @@ from config import (
 )
 from query_engine import stream_llm_answer, preload, prewarm_llm
 from context_manager import context_store
-from system_audio import system_audio_service, get_whisper_model, get_interim_model
+
+# System Audio (Optional on Cloud Deployments like Render)
+system_audio_service = None
+get_whisper_model = None
+get_interim_model = None
+
+if SYSTEM_AUDIO_ENABLED:
+    try:
+        from system_audio import system_audio_service, get_whisper_model, get_interim_model
+    except Exception as e:
+        print(f"[main] System audio capture unavailable: {e}")
+        SYSTEM_AUDIO_ENABLED = False
 
 # Active WebSocket connections and session tracking
 _active_websockets: Set[WebSocket] = set()
@@ -215,17 +226,23 @@ async def lifespan(app: FastAPI):
     # Pre-warm TLS connections in background
     asyncio.create_task(prewarm_llm())
 
-    if SYSTEM_AUDIO_ENABLED:
-        system_audio_service.on_question = on_system_question
-        system_audio_service.on_interim = on_system_interim
-        system_audio_service.start()
-        print("[main] System audio capture auto-started with live hearing.")
+    if SYSTEM_AUDIO_ENABLED and system_audio_service:
+        try:
+            if get_whisper_model: get_whisper_model()
+            if get_interim_model: get_interim_model()
+            system_audio_service.on_question = on_system_question
+            system_audio_service.on_interim = on_system_interim
+            system_audio_service.start()
+            print("[main] System audio capture auto-started with live hearing.")
+        except Exception as e:
+            print(f"[main] Failed to start system audio: {e}")
 
     print("[main] Ready to accept connections.")
     yield
 
     print("[main] Shutting down...")
-    system_audio_service.stop()
+    if system_audio_service:
+        system_audio_service.stop()
 
 
 # ── FastAPI app ────────────────────────────────────────
@@ -261,7 +278,7 @@ async def health():
     return JSONResponse({
         "status": "ok",
         "active_sessions": context_store.active_sessions,
-        "system_audio_active": system_audio_service.running and not system_audio_service.paused,
+        "system_audio_active": bool(system_audio_service and system_audio_service.running and not system_audio_service.paused),
         "default_provider": DEFAULT_PROVIDER,
     })
 

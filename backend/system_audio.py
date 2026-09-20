@@ -24,7 +24,10 @@ import threading
 from collections import deque
 from typing import Callable, Optional
 import numpy as np
-from faster_whisper import WhisperModel
+try:
+    from faster_whisper import WhisperModel
+except ImportError:
+    WhisperModel = None
 
 from config import (
     WHISPER_MODEL_NAME, WHISPER_INTERIM_MODEL, WHISPER_INITIAL_PROMPT,
