@@ -4,48 +4,37 @@ const PRODUCTION_WS_URL = 'wss://stealth-interview-copilot-backend.onrender.com/
 
 /**
  * Normalizes backend WebSocket URL.
- * Automatically defaults to live deployed Render backend in production,
+ * Automatically connects to live deployed Render backend in production,
  * and localhost in development.
  */
 function resolveWebSocketUrl(customUrl, clientId) {
+  // Clear any old manual entries from storage
+  if (typeof localStorage !== 'undefined') {
+    try {
+      localStorage.removeItem('intervai_backend_url')
+    } catch {}
+  }
+
   const envWsUrl = (import.meta.env.VITE_WS_URL || '').trim()
   const isLocalhost = typeof window !== 'undefined' && 
     (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
 
   let target = customUrl || envWsUrl
 
-  // In production (e.g. on Vercel), default directly to deployed Render backend
+  // In production (e.g. on Vercel), default directly to live deployed Render backend
   if (!target && !isLocalhost) {
-    target = PRODUCTION_WS_URL
+    return `${PRODUCTION_WS_URL}?client_id=${clientId}`
   }
 
   if (target) {
     let clean = target.trim()
-    // Fix typos like https// or wss//
-    clean = clean.replace(/^https?\/\//i, (m) => m.toLowerCase().startsWith('https') ? 'https://' : 'http://')
-    clean = clean.replace(/^wss?\/\//i, (m) => m.toLowerCase().startsWith('wss') ? 'wss://' : 'ws://')
+    // Strip any protocol or typo prefix (https://, https//, wss://, wss//, etc.)
+    clean = clean.replace(/^(https?|wss?):?\/*/i, '')
+    // Strip trailing slashes and redundant /ws
+    clean = clean.replace(/\/ws\/?$/i, '').replace(/\/+$/, '')
 
-    if (clean.startsWith('http://')) {
-      clean = 'ws://' + clean.slice(7)
-    } else if (clean.startsWith('https://')) {
-      clean = 'wss://' + clean.slice(8)
-    } else if (!clean.startsWith('ws://') && !clean.startsWith('wss://')) {
-      clean = 'wss://' + clean
-    }
-
-    try {
-      const parsed = new URL(clean)
-      if (!parsed.pathname || parsed.pathname === '/' || parsed.pathname === '') {
-        parsed.pathname = '/ws'
-      }
-      parsed.searchParams.set('client_id', clientId)
-      return parsed.toString()
-    } catch {
-      const base = clean.replace(/\/+$/, '')
-      const sep = base.includes('?') ? '&' : '?'
-      const hasWs = base.includes('/ws')
-      return hasWs ? `${base}${sep}client_id=${clientId}` : `${base}/ws?client_id=${clientId}`
-    }
+    const protocol = (isLocalhost && !clean.includes('onrender.com')) ? 'ws://' : 'wss://'
+    return `${protocol}${clean}/ws?client_id=${clientId}`
   }
 
   // Localhost development fallback
@@ -69,13 +58,6 @@ export default function useWebSocket({ url, onMessage, autoConnect = true } = {}
   const isUnmountedRef = useRef(false)
   const messageQueueRef = useRef([])
   const maxReconnectAttempts = 20
-
-  useEffect(() => {
-    // Clear any previous malformed manual URL from storage
-    try {
-      localStorage.removeItem('intervai_backend_url')
-    } catch {}
-  }, [])
 
   useEffect(() => {
     onMessageRef.current = onMessage
