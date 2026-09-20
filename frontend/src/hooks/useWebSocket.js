@@ -1,22 +1,36 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 
+const PRODUCTION_WS_URL = 'wss://stealth-interview-copilot-backend.onrender.com/ws'
+
 /**
- * Normalizes any backend URL into a valid WebSocket URL.
- * Handles cases where users enter https://..., http://..., or omit /ws.
+ * Normalizes backend WebSocket URL.
+ * Automatically defaults to live deployed Render backend in production,
+ * and localhost in development.
  */
 function resolveWebSocketUrl(customUrl, clientId) {
-  let wsUrl = ''
   const envWsUrl = (import.meta.env.VITE_WS_URL || '').trim()
-  const target = customUrl || envWsUrl
+  const isLocalhost = typeof window !== 'undefined' && 
+    (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+
+  let target = customUrl || envWsUrl
+
+  // In production (e.g. on Vercel), default directly to deployed Render backend
+  if (!target && !isLocalhost) {
+    target = PRODUCTION_WS_URL
+  }
 
   if (target) {
-    let clean = target
+    let clean = target.trim()
+    // Fix typos like https// or wss//
+    clean = clean.replace(/^https?\/\//i, (m) => m.toLowerCase().startsWith('https') ? 'https://' : 'http://')
+    clean = clean.replace(/^wss?\/\//i, (m) => m.toLowerCase().startsWith('wss') ? 'wss://' : 'ws://')
+
     if (clean.startsWith('http://')) {
       clean = 'ws://' + clean.slice(7)
     } else if (clean.startsWith('https://')) {
       clean = 'wss://' + clean.slice(8)
     } else if (!clean.startsWith('ws://') && !clean.startsWith('wss://')) {
-      clean = (window.location.protocol === 'https:' ? 'wss://' : 'ws://') + clean
+      clean = 'wss://' + clean
     }
 
     try {
@@ -25,20 +39,19 @@ function resolveWebSocketUrl(customUrl, clientId) {
         parsed.pathname = '/ws'
       }
       parsed.searchParams.set('client_id', clientId)
-      wsUrl = parsed.toString()
+      return parsed.toString()
     } catch {
       const base = clean.replace(/\/+$/, '')
       const sep = base.includes('?') ? '&' : '?'
       const hasWs = base.includes('/ws')
-      wsUrl = hasWs ? `${base}${sep}client_id=${clientId}` : `${base}/ws?client_id=${clientId}`
+      return hasWs ? `${base}${sep}client_id=${clientId}` : `${base}/ws?client_id=${clientId}`
     }
-  } else {
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-    const host = window.location.host
-    wsUrl = `${protocol}//${host}/ws?client_id=${clientId}`
   }
 
-  return wsUrl
+  // Localhost development fallback
+  const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+  const host = window.location.host
+  return `${protocol}//${host}/ws?client_id=${clientId}`
 }
 
 /**
@@ -56,6 +69,13 @@ export default function useWebSocket({ url, onMessage, autoConnect = true } = {}
   const isUnmountedRef = useRef(false)
   const messageQueueRef = useRef([])
   const maxReconnectAttempts = 20
+
+  useEffect(() => {
+    // Clear any previous malformed manual URL from storage
+    try {
+      localStorage.removeItem('intervai_backend_url')
+    } catch {}
+  }, [])
 
   useEffect(() => {
     onMessageRef.current = onMessage
@@ -78,7 +98,7 @@ export default function useWebSocket({ url, onMessage, autoConnect = true } = {}
     if (heartbeatTimerRef.current) {
       clearInterval(heartbeatTimerRef.current)
     }
-    // Ping every 20s to prevent reverse proxy (Render/Cloudflare) idle disconnects
+    // Ping every 20s to prevent Render free tier proxy idle disconnects
     heartbeatTimerRef.current = setInterval(() => {
       if (wsRef.current && wsRef.current === wsInstance && wsRef.current.readyState === WebSocket.OPEN) {
         try {
@@ -126,7 +146,7 @@ export default function useWebSocket({ url, onMessage, autoConnect = true } = {}
         }
         if (wsRef.current !== ws) return
 
-        console.log('[useWebSocket] Connected successfully.')
+        console.log('[useWebSocket] Connected successfully to', wsUrl)
         setIsConnected(true)
         reconnectAttemptsRef.current = 0
         startHeartbeat(ws)
@@ -164,7 +184,7 @@ export default function useWebSocket({ url, onMessage, autoConnect = true } = {}
           wsRef.current = null
 
           if (!isUnmountedRef.current && reconnectAttemptsRef.current < maxReconnectAttempts) {
-            const delay = Math.min(1000 * Math.pow(1.5, reconnectAttemptsRef.current), 6000)
+            const delay = Math.min(1000 * Math.pow(1.5, reconnectAttemptsRef.current), 5000)
             console.log(`[useWebSocket] Reconnecting in ${Math.round(delay)}ms...`)
             reconnectTimerRef.current = setTimeout(() => {
               reconnectAttemptsRef.current++

@@ -20,12 +20,8 @@ export default function Header({
   isPaused = false,
   onClearSession,
   onSubmitQuestion,
-  backendUrl = '',
-  onSaveBackendUrl,
 }) {
   const [inputValue, setInputValue] = useState('')
-  const [isConfigOpen, setIsConfigOpen] = useState(false)
-  const [urlInput, setUrlInput] = useState(backendUrl || '')
 
   const handleSend = (e) => {
     e?.preventDefault()
@@ -34,14 +30,6 @@ export default function Header({
       onSubmitQuestion(inputValue.trim())
       setInputValue('')
     }
-  }
-
-  const handleSaveUrl = (e) => {
-    e?.preventDefault()
-    if (onSaveBackendUrl) {
-      onSaveBackendUrl(urlInput)
-    }
-    setIsConfigOpen(false)
   }
 
   const handleKeyDown = (e) => {
@@ -120,25 +108,9 @@ export default function Header({
       <div className="parakeet-substrip">
         <div className="substrip-left">
           <span className={`status-dot ${isPaused ? 'paused' : !isConnected ? 'disconnected' : ''}`} />
-          <span
-            className={`substrip-status-text ${!isConnected ? 'clickable-disconnected' : ''}`}
-            onClick={() => !isConnected && setIsConfigOpen(true)}
-            title={!isConnected ? 'Click to connect your backend URL' : ''}
-          >
+          <span className="substrip-status-text">
             {getTranscriptionStatusText()}
           </span>
-
-          {!isConnected && (
-            <button
-              type="button"
-              className="substrip-connect-action"
-              onClick={() => setIsConfigOpen(true)}
-              title="Configure Backend URL (e.g. Render)"
-            >
-              ⚙️ Connect Engine
-            </button>
-          )}
-
           <span className="substrip-timer" title="Session duration">
             {sessionTime}
           </span>
@@ -177,52 +149,6 @@ export default function Header({
           </button>
         </div>
       </div>
-
-      {/* ── Backend Connection Modal ──────────────────────── */}
-      {isConfigOpen && (
-        <div className="backend-modal-overlay" onClick={() => setIsConfigOpen(false)}>
-          <div className="backend-modal" onClick={(e) => e.stopPropagation()}>
-            <div className="backend-modal-header">
-              <div className="backend-modal-title">
-                <span className="modal-icon">⚡</span>
-                <h3>FastAPI Backend Connection</h3>
-              </div>
-              <button
-                type="button"
-                className="backend-modal-close"
-                onClick={() => setIsConfigOpen(false)}
-                aria-label="Close modal"
-              >
-                ×
-              </button>
-            </div>
-
-            <p className="backend-modal-desc">
-              Connect this frontend to your deployed Render FastAPI backend.
-            </p>
-
-            <form onSubmit={handleSaveUrl} className="backend-modal-form">
-              <label className="backend-input-label">Render Web Service URL</label>
-              <div className="backend-input-row">
-                <input
-                  type="text"
-                  className="backend-url-input"
-                  placeholder="e.g. https://your-service.onrender.com"
-                  value={urlInput}
-                  onChange={(e) => setUrlInput(e.target.value)}
-                  autoFocus
-                />
-                <button type="submit" className="backend-save-btn">
-                  Connect
-                </button>
-              </div>
-              <span className="backend-hint">
-                Accepts <code>https://...</code>, <code>wss://...</code>, or <code>localhost:8000</code>. URL is saved to your browser automatically.
-              </span>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   )
 }
