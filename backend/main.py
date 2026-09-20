@@ -218,10 +218,8 @@ async def lifespan(app: FastAPI):
     global _event_loop
     _event_loop = asyncio.get_running_loop()
 
-    print("[main] Pre-warming LLM connections and Whisper models...")
+    print("[main] Pre-warming LLM connections...")
     preload()
-    get_whisper_model()  # warm up faster-whisper base.en
-    get_interim_model()  # warm up faster-whisper tiny.en
 
     # Pre-warm TLS connections in background
     asyncio.create_task(prewarm_llm())
@@ -319,9 +317,9 @@ async def websocket_endpoint(websocket: WebSocket):
     # Send initial status
     await websocket.send_json({
         "type": "system_status",
-        "system_audio_active": system_audio_service.running,
+        "system_audio_active": bool(system_audio_service and system_audio_service.running and not system_audio_service.paused),
         "default_provider": DEFAULT_PROVIDER,
-        "audio_mode": "system",
+        "audio_mode": "system" if system_audio_service else "mic",
     })
 
     try:
@@ -350,10 +348,11 @@ async def websocket_endpoint(websocket: WebSocket):
             if msg_type == "set_audio_mode":
                 new_mode = (msg.get("mode") or "system").lower()
                 _websocket_modes[websocket] = new_mode
-                if new_mode == "mic":
-                    system_audio_service.pause()
-                else:
-                    system_audio_service.resume()
+                if system_audio_service:
+                    if new_mode == "mic":
+                        system_audio_service.pause()
+                    else:
+                        system_audio_service.resume()
                 print(f"[ws] Session {session_id[:8]} set audio mode to: {new_mode}")
                 await websocket.send_json({
                     "type": "audio_mode_changed",
@@ -363,10 +362,12 @@ async def websocket_endpoint(websocket: WebSocket):
 
             # ── Handle Pause/Resume ────────────────────
             if msg_type == "pause_system_audio":
-                system_audio_service.pause()
+                if system_audio_service:
+                    system_audio_service.pause()
                 continue
             if msg_type == "resume_system_audio":
-                system_audio_service.resume()
+                if system_audio_service:
+                    system_audio_service.resume()
                 continue
 
             # ── Handle Question (Voice or Text) ────────
