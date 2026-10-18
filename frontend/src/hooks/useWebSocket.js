@@ -28,8 +28,8 @@ function resolveWebSocketUrl(customUrl, clientId) {
 
   if (target) {
     let clean = target.trim()
-    // Strip any protocol or typo prefix (https://, https//, wss://, wss//, etc.)
-    clean = clean.replace(/^(https?|wss?):?\/*/i, '')
+    // Strip any protocol or typo prefix (https://, https//, wss://, wss//, wss://https://, etc.)
+    clean = clean.replace(/^((https?|wss?):?\/*)+/i, '')
     // Strip trailing slashes and redundant /ws
     clean = clean.replace(/\/ws\/?$/i, '').replace(/\/+$/, '')
 
